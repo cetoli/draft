@@ -1,0 +1,56 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="iso-8859-1">
+<title>Jogo da Velha 4x4</title>
+<meta http-equiv="content-type" content="application/xml;charset=utf-8" />
+<link rel="shortcut icon" href="/static/favicon.ico" type="image/x-icon" />
+<!--script type="text/javascript" src="https://dl.dropboxusercontent.com/u/1751704/lib/Brython2.1.1/brython.js"></script-->
+<script type="text/javascript" src="../../lib/Brython2.1.1/brython.js"></script>
+<script type="text/javascript" src="../../lib/Brython2.1.1/libs/base64v1_0.js"></script>
+<script type="text/python">
+from browser import html, doc, svg
+from javascript import JSObject
+from urllib import request
+print(JSObject(B64.encode)("decode error"))
+#_fp, _, _=request.urlopen("http://activufrj.nce.ufrj.br/paint/carlo")
+_fp, _, _=request.urlopen("paint.html")
+_data=_fp.read()
+#draw = _data.split('"data:image\/xml;base64,')[1:]
+draw = _data.split('src="data:image')[1:]
+#draw = _data
+drawimg = [s[16:].split("> <")[0][:-1] for s in draw]
+draw = [JSObject(B64.decode)(s) for s in drawimg]
+print (len(draw))
+
+for d in draw:
+  print(d[:80],"@@@@@@", d[-80:])
+
+for d in drawimg:
+  print('data:image/svg+xml;base64,'+d[:80],"@@@@@@", d[-80:])
+
+def do_svg(ev):
+  doc["main"].html = draw[int(ev.target.id[3:])]
+  sv1 = doc.get(selector='g')
+  print(sv1)
+  ta = svg.foreignObject(x=50,y=150, width=100, height=200)
+  sv1[0] <= ta
+  ta.text = "the quick brown fox jumps over the lazy dog"
+  #sv1[0] <= svg.text("the quick brown fox jumps over the lazy dog",x=50,y=150, width=100)
+
+for i, j in enumerate(drawimg):
+   img = html.IMG(id="img%d"%i, src='data:image/svg+xml;base64,'+j, width=80)
+   img.onclick = do_svg
+   doc["main"]<= img
+
+
+</script>
+
+</head>
+<body onLoad="brython(1)">
+<div id="main">
+</div>
+
+
+</body>
+</html>
