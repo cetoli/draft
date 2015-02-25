@@ -35,6 +35,8 @@ MKD = 4
 DEMO = "blue "*MKD + "green "*MKD + "red "*MKD + "orange "*MKD + "purple "*MKD
 DEMO = "blue "*MKD + "green "*MKD + "red "*6
 DEMO = DEMO.split()
+R2D = 180/pi
+TLT = ["Dimensão"]*3
 
 
 class Dendogram:
@@ -63,10 +65,10 @@ class Dendogram:
         self.drawtier(220, 280, "blue green red".split()*14*3, [3]*14*3*3, [2]*14*3, -CF/(14*3*3))
 
     def drawdend(self):
-        self.drawtier(40, 100, "blue green red".split(), [4, 4, 4], [1, 1, 1])
-        self.drawtier(100, 160, "blue green red".split()*3, [6, 4, 4]*3, [2]*3, -CF/7)
-        self.drawtier(160, 220, DEMO*3, [3]*14*3, [3, 3, 5]*3, -CF/(7))
-        self.drawtier(220, 280, "blue green red".split()*14*3, [3]*14*3*3, [2]*14*3, -2*CF/(14*3*3))
+        self.drawtier(40, 100, "blue green red".split(), [4, 4, 4], [1, 1, 1], CF/(14*3), "Microgênese")
+        self.drawtier(100, 160, "blue green red".split()*3, [6, 4, 4]*3, [2]*3, -CF*9/(14*3), "Ontogênese")
+        self.drawtier(160, 220, DEMO*3, [3]*14*3, [3, 3, 5]*3, -CF/7, "Sub-ontogênese")
+        self.drawtier(220, 280, "blue green red".split()*14*3, [3]*14*3*3, [2]*14*3, -2*CF/(14*3*3), "Filogênese")
 
     def drawarc(self, x0, y0, x1, y1, color):
         x0, y0, x1, y1 = x0+OFF, y0+OFF, x1+OFF, y1+OFF
@@ -74,7 +76,16 @@ class Dendogram:
         self.tela <= self.pena.path(d="M %f %f A %f %f 0 0 1 %f %f" % (x0, y0, cx, cy, x1, y1),
                                     stroke=color, stroke_width="2", fill="none")
 
-    def drawtier(self, l0=100, l1=200, color=DEMO, spacing=(), arcs=(), off=0):
+    def drawtext(self, text, x0, y0, angle=None):
+        return
+        if angle is None:
+            self.tela <= self.pena.text(text, x=x0+OFF, y=y0+OFF, font_size=10)
+        else:
+            self.tela <= self.pena.text(
+                text, x=x0+OFF, y=y0+OFF, font_size=10,
+                transform="translate(%d %d) rotate(%f %d,%d)" % (x0, y0, angle*R2D, OFF, OFF))
+
+    def drawtier(self, l0=100, l1=200, color=DEMO, spacing=(), arcs=(), off=0, text='', title=TLT[:]):
         # l0, l1 = 100, 200
         lines = len(color)
         spaces = sum(spacing)  # + len(spacing)
@@ -99,6 +110,11 @@ class Dendogram:
             # self.drawarc(xa, ya, xa+10, ya+10, color[r])
             xa, ya = x0, y0
             self.drawline(x0, y0, x1, y1, color[r])
+            if title:
+                sub = title.pop(0)
+                self.drawtext(sub, x0, y0, angle+t)
+
+        self.drawtext(text, 0, (l1+l0)/2)
 
     def drawline(self, x0, y0, x1, y1, color="brown"):
         x0, y0, x1, y1 = x0+OFF, y0+OFF, x1+OFF, y1+OFF
