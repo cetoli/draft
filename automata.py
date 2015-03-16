@@ -30,7 +30,7 @@ FILO = "PI PM PS ME".split()
 PSUBF = "M. C. L.".split()
 OFILO = "Cajado,Diferencia Cores,Grupos;Fogo,Sinais,Conta Alimentos;Tinta,Desenho Rupestre,Desenho Rupestre;" \
         "Palafita,Marca Habitação,Conta Animais".split(";")
-OFILO = [filo.split(",") for filo in OFILO]
+OFILO = [tuple(filo.split(",")) for filo in OFILO]
 PONTO = "_Sistema _Transformacao _Implicacao".split()
 PFILO = "P.I. P.M. P.S. ME.".split()
 TFILO = "PALEOLÍTICO INFERIOR,PALEOLÍTICO MÉDIO,PALEOLÍTICO SUPERIOR,MESOLÍTICO".split(",")
@@ -49,6 +49,8 @@ FTRO = "\t\t</tr>"
 FTCO = "\t\t\t</td>"
 LINK = '<a href="https://activufrj.nce.ufrj.br/wiki/NeuroXIV_1/%s#%s">%s</a>'
 TITULO = '<p><a id="%s" name="%s"></a>%s</p><p>&nbsp;</p>'
+HEADC = tuple(x+y for s in SUBF for x, y in zip([GR]*3, SUBC[s]))
+HEADO = [tuple(x+y+UP for x, y in zip([GR]*3, SUBC[s])) for s in SUBF]
 HEAD = """
 <tr>
         <td colspan="10" style="width:1188px;">
@@ -64,24 +66,24 @@ HEAD = """
         </td>
     </tr>
     <tr>
-        <td colspan="3" style="width:290px;">
+        <td colspan="3" style="width:290px;background-color: rgb(%d, %d, %d);">
         <p align="center">Matem&aacute;tica</p>
         </td>
-        <td colspan="3" style="width:287px;">
+        <td colspan="3" style="width:287px;background-color: rgb(%d, %d, %d);">
         <p align="center">Linguagem</p>
         </td>
-        <td colspan="3" style="width:269px;">
+        <td colspan="3" style="width:269px;background-color: rgb(%d, %d, %d);">
         <p align="center">Ci&ecirc;ncia</p>
         </td>
     </tr>
     <tr>
-        <td colspan="3" style="width:290px;">
+        <td colspan="3" style="width:290px;background-color: rgb(%d, %d, %d);">
         <p align="center">Ontog&ecirc;nese - %s</p>
         </td>
-        <td colspan="3" style="width:287px;">
+        <td colspan="3" style="width:287px;background-color: rgb(%d, %d, %d);">
         <p align="center">Ontog&ecirc;nese - %s</p>
         </td>
-        <td colspan="3" style="width:269px;">
+        <td colspan="3" style="width:269px;background-color: rgb(%d, %d, %d);">
         <p align="center">Ontog&ecirc;nese - %s</p>
         </td>
     </tr>
@@ -121,8 +123,10 @@ def tabela():
     print(TBL)
     print(TBD)
     for a, f, o in zip(FILO, TFILO, OFILO):
-        head = tuple([f]+o[::-1])
+        headc = tuple(x+(y,) for y, x in zip(o[::-1], HEADO))
+        head = tuple((f,)+HEADC+headc)
         odd = False
+        print(head)
         print(HEAD % head)
         for b, t in zip(MICRO, MICROT.split(",")):
             color = GR if odd else GR + UP
