@@ -1,6 +1,8 @@
 __author__ = 'carlo'
 RND = 3141
-BLEACH = 19
+SBLEACH = 3
+EBLEACH = 1
+IBLEACH = 1
 
 
 def tupler(x):
@@ -10,13 +12,14 @@ def tupler(x):
 class Wisard:
     """Rede neural sem peso. :ref:`wisard'
     """
-    def __init__(self, retinasize=3*4, ramorder=2):
+    def __init__(self, retinasize=3*4, bleach=0, ramorder=2):
         # self.cortex = [{t: 0 for t in tupler(ramorder-1)} for _ in range(retinasize//2)]
         self.cortex = [{(a, b): 0 for a in [0, 1] for b in [0, 1]} for _ in range(retinasize//2)]
+        self.bleach = bleach
 
-    def learn(self, retina):
+    def learn(self, retina, offset=1):
         def updater(ram, index):
-            return {index: self.cortex[ram][index]+1}
+            return {index: self.cortex[ram][index]+offset}
         # print(len(retina)//2)
         x = (len(retina)//2)
         [self.cortex[ram].update(updater(ram, (retina.pop(RND % len(retina)), retina.pop(RND % len(retina)))))
@@ -24,25 +27,10 @@ class Wisard:
 
     def classify(self, retina):
         x = (len(retina)//2)
-        return ([self.cortex[ram][(retina.pop(RND % len(retina)), retina.pop(RND % len(retina)))]-BLEACH
+        return ([self.cortex[ram][(retina.pop(RND % len(retina)), retina.pop(RND % len(retina)))]-self.bleach
                 for ram in range(x)])
 
 
-def main():
-    print('Wisard 0.1.0')
-    print(tupler(1))
-    wis = Wisard()
-    print(wis.cortex)
-    wis.learn([1, 0, 0, 1]+[1, 1, 1, 1]+[1, 0, 0, 1])
-    print(wis.cortex)
-    print(wis.classify([1, 0, 0, 1]+[1, 1, 1, 1]+[1, 0, 0, 1]))
-    print(wis.classify([0, 0, 0, 1]+[1, 1, 1, 1]+[1, 0, 0, 1]))
-
-# main()
-# wis = Wisard(retinasize=24)
-# for _ in range(100):
-#    wis.learn([1, 0, 0, 1]+[1, 1, 1, 1]+[1, 0, 0, 1]+[1, 0, 0, 1]+[1, 1, 1, 1]+[1, 0, 0, 1])
-#    wis.classify([1, 0, 0, 1]+[1, 1, 1, 1]+[1, 0, 0, 1])
 DATA = '''
 5.1,3.5,1.4,0.2,Iris-setosa
 4.9,3.0,1.4,0.2,Iris-setosa
@@ -197,20 +185,13 @@ DATA = '''
 '''.split()
 MAP = {"Iris-virginica": 0, "Iris-versicolor": 1, "Iris-setosa": 2}
 SDATA = {0: [], 1: [], 2: []}
-# SDATA = {MAP[r.split(",")[-1]]: SDATA[MAP[r.split(",")[-1]]]+[[int(float(d)*10)
-#  for d in r.split(",")[:-1]]] for r in DATA}
-for r in DATA:
-    lr = r.split(",")
-    mp, ml = lr[-1], lr[:-1]
-    SDATA[MAP[mp]].append([int(float(d)*10) for d in ml])
-# print([[int(float(d)*10) for d in r.split(",")[:-1]]+[MAP[r.split(",")[-1]]] for r in DATA])
+[SDATA[MAP[r.split(",")[-1]]].append([int(float(d)*10)
+ for d in r.split(",")[:-1]]) for r in DATA]
 print (SDATA)
 print("#"*20)
-FATOR = 1
+FATOR = 4
 ZFATOR = 2*FATOR
 TOP = 100//FATOR
-# BDATA = {i: [[([0]*(3*(j//ZFATOR)))+([1]*(j//ZFATOR))+([0]*(TOP-(4*(j//ZFATOR))))
-#              for j in k] for k in d] for i, d in SDATA.items()}
 BDATA = {i: [[([0]*(1*(j//ZFATOR)))+([1]*(j//ZFATOR))+([0]*(TOP-(2*(j//ZFATOR))))
               for j in k] for k in d] for i, d in SDATA.items()}
 # BDATA = {i: [[[1]*j for j in k] for k in d] for i, d in SDATA.items()}
@@ -220,41 +201,66 @@ print ([["".join("%d" % i for i in j) for j in k] for k in BDATA[0][:10]])
 # print ([1 for j in BDATA[0][0]  for i in j] )
 RS = (sum(1 for j in BDATA[0][0] for i in j))
 
-setosa = Wisard(RS)
-versicolor = Wisard(RS)
-virginica = Wisard(RS)
-dse = BDATA[2][:]
-dve = BDATA[1][:]
-dvi = BDATA[0][:]
-from random import shuffle
-shuffle(dse)
-shuffle(dve)
-shuffle(dvi)
-for i in range(25):
-    setosa.learn([i for j in dse.pop() for i in j])
-    versicolor.learn([i for j in dve.pop() for i in j])
-    virginica.learn([i for j in dvi.pop() for i in j])
-print("#"*20)
-# print(setosa.cortex)
-for i in []:
-    rse, rve, rvi = dse.pop(),  dve.pop(), dve.pop()
-    setosa.classify([i for j in rse for i in j])
-    versicolor.learn([i for j in rve for i in j])
-    virginica.learn([i for j in rvi for i in j])
 
-cls = [[
-    sum(setosa.classify([i for j in rse for i in j])),
-    sum(versicolor.classify([i for j in rve for i in j])),
-    sum(virginica.classify([i for j in rvi for i in j])),
-    sum(setosa.classify([i for j in rve for i in j])),
-    sum(versicolor.classify([i for j in rvi for i in j])),
-    sum(virginica.classify([i for j in rse for i in j])),
-    sum(setosa.classify([i for j in rvi for i in j])),
-    sum(versicolor.classify([i for j in rse for i in j])),
-    sum(virginica.classify([i for j in rve for i in j]))
-    ] for rse, rve, rvi in zip(dse, dve, dvi)]
+def go():
+    setosa = Wisard(RS, SBLEACH)
+    versicolor = Wisard(RS, EBLEACH)
+    virginica = Wisard(RS, IBLEACH)
+    dse = BDATA[2][:]
+    dve = BDATA[1][:]
+    dvi = BDATA[0][:]
+    from random import shuffle
+    shuffle(dse)
+    shuffle(dve)
+    shuffle(dvi)
+    ENFORCE = 6
+    SUPPRESS = -1
+    for i in range(5):
+        lse, lve, lvi = dse.pop(),  dve.pop(), dvi.pop()
+        setosa.learn([i for j in lse for i in j], ENFORCE)
+        versicolor.learn([i for j in lve for i in j], ENFORCE)
+        virginica.learn([i for j in lvi for i in j], ENFORCE)
+        setosa.learn([i for j in lve for i in j], SUPPRESS)
+        versicolor.learn([i for j in lvi for i in j], SUPPRESS)
+        virginica.learn([i for j in lse for i in j], SUPPRESS)
+        setosa.learn([i for j in lvi for i in j], SUPPRESS)
+        versicolor.learn([i for j in lse for i in j], SUPPRESS)
+        virginica.learn([i for j in lve for i in j], SUPPRESS)
+    # print("#"*20)
+    # print(setosa.cortex)
+    for i in []:
+        rse, rve, rvi = dse.pop(),  dve.pop(), dve.pop()
+        setosa.classify([i for j in rse for i in j])
+        versicolor.learn([i for j in rve for i in j])
+        virginica.learn([i for j in rvi for i in j])
 
-print (cls)
-ccls = len(cls)
-pcls = [100*sum(1 if i >= 100 else -1 for i in j)//ccls for j in zip(*cls)]
-print(pcls)
+    cls = [
+        [
+            sorted([
+                (sum(setosa.classify([i for j in rse for i in j])), 0),
+                (sum(versicolor.classify([i for j in rse for i in j])), 1),
+                (sum(virginica.classify([i for j in rse for i in j])), 2)
+            ]),
+            sorted([
+                (sum(setosa.classify([i for j in rve for i in j])), 0),
+                (sum(versicolor.classify([i for j in rve for i in j])), 1),
+                (sum(virginica.classify([i for j in rve for i in j])), 2)
+            ]),
+            sorted([
+                (sum(virginica.classify([i for j in rvi for i in j])), 2),
+                (sum(versicolor.classify([i for j in rvi for i in j])), 1),
+                (sum(setosa.classify([i for j in rvi for i in j])), 0)
+            ])
+        ] for rse, rve, rvi in zip(dse, dve, dvi)]
+
+    # print (cls)
+    ocls = [[(tup[-1][1], 100*(tup[-1][0] - tup[-2][0])//tup[-1][0]) for tup in triade] for triade in cls]
+    # print(ocls)
+    scls = [[1 for clsd, real in zip(cl, (0, 1, 2)) if clsd[0] == real] for cl in ocls]
+    sscls = sum(1 for cl in ocls for clsd, real in zip(cl, (0, 1, 2)) if clsd[0] == real)
+    # print(scls)
+    return 100*sscls//(len(scls)*3)
+SAMP = 50
+acc = [go() for _ in range(SAMP)]
+
+print(min(acc), max(acc), sum(acc)//SAMP)  # , acc)
