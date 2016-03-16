@@ -13,13 +13,14 @@ Calculo das notas para plotagem
 :Home: `Labase <http://labase.nce.ufrj.br/>`__
 :Copyright: ©2010, `GPL <http://is.gd/3Udt>__.
 """
-import matplotlib
-import matplotlib.pyplot as plt
 import mechanize
 # from BeautifulSoup import BeautifulSoup as soup
-from colors import COLOR as k
+from colors import COLOR as K
 import ssl
 import json
+import matplotlib
+matplotlib.use('Agg')
+import matplotlib.pyplot as plt
 
 try:
     _create_unverified_https_context = ssl._create_unverified_context
@@ -30,27 +31,28 @@ else:
     # Handle target environment that doesn't support HTTPS verification
     ssl._create_default_https_context = _create_unverified_https_context
 # ssl_version corrections are done
-matplotlib.use('Agg')
 
-COLORS = [k.red, k.green, k.blue, k.fuchsia, k.teal, k.navy, k.maroon, k.yellow,
-          k.purple, k.darkgoldenrod, k.lime, k.aqua, k.tomato, k.olivedrab, k.dodgerblue,
-          k.lightpink, k.lightgreen, k.black, k.gray, k.silver]
+
+COLORS = [K.red, K.green, K.blue, K.fuchsia, K.teal, K.navy, K.maroon, K.yellow,
+          K.purple, K.darkgoldenrod, K.lime, K.aqua, K.tomato, K.olivedrab, K.dodgerblue,
+          K.lightpink, K.lightgreen, K.black, K.gray, K.silver]
 __author__ = "Carlo E. T. Oliveira (cetoli@yahoo.com.br) $Author: cetoli $"
 __version__ = "1.0 $Revision$"[10:-1]
 __date__ = "2012/03/24 $Date$"
+NL = []
 
 
 class Main:
     def __init__(self, page, owners, avals, nopeers, degrade, pub_dir,
-                 grades, averages, evs=[], peers=[], plat=None, no_last=0):
+                 grades, averages, evs=NL, peers=NL, plat=None, no_last=0):
         self.owners, self.avals, self.nopeers = owners, avals, nopeers
         self.degrade, self.pub_dir, self.peers = degrade, pub_dir, peers
         self.grades_file, self.averages_file = grades, averages
         self.page, self.evs, self.no_last = page, evs, no_last
         self.plat = plat or 'https://activufrj.nce.ufrj.br'
-        self.events = self.norms = self.grades = self.titles = None
+        self.events = self.norms = self.grades = self.titles = self.range = self.speers = None
 
-    def plot_results(self, file='test_grades.png'):
+    def plot_results(self, outfile='test_grades.png'):
         tcks = ['%s%s:%d' % (lab[0:3], lab[-2:], ind) for ind, lab in enumerate(self.events)]
         # plotter = ['.', ',', ':','-','--' ,'-.',':','-','--' ]*6# 	,':','.','<','>', '+', 'v', '^']
         plotter = []
@@ -61,12 +63,13 @@ class Main:
         top = .9 - (len(set(self.peers) - set(self.nopeers)) / 3.0) * 0.05
         plt.subplots_adjust(bottom=0.08, left=.05, right=.96, top=top, hspace=.35)
         for peer, plot, color in zip(self.speers, plotter, color):
-            if peer in self.nopeers: continue
+            if peer in self.nopeers or "_" in peer:
+                continue
             plt.plot(self.grades[peer], plot, color=color, label=peer[:15], linewidth=2.0)
             plt.legend(bbox_to_anchor=(0, 1, 1, 3), loc=3, borderaxespad=1., ncol=3,
                        mode="expand", )  # loc='upper right')
             # plt.margins(10,10)
-            plt.savefig(self.pub_dir + file, pad_inches=2)
+            plt.savefig(self.pub_dir + outfile, pad_inches=2)
             # plt.label(peer)
         plt.show()
 
@@ -76,18 +79,20 @@ class Main:
         # self.norms = [(max(ev)> 0 and max(ev) or 9,
         #    min(ev)>max(ev)/3.0 and min(ev) or max(ev)/3.0)  for ev in zip(*grades)]
         for peer in self.grades:
-            if peer in self.nopeers: continue
+            if peer in self.nopeers:
+                continue
             self.grades[peer] = [g * 100 / (n + 2) + 1 for g, n in zip(self.grades[peer], self.norms)]  # [:-1])]
 
     def average_grade_grid(self):
-        def min_for_max(grades):
-            grades[grades.index(min(grades))] = max(grades)
-            if len(grades) > 6:
-                grades[grades.index(min(grades))] = max(grades)
-            return grades
+        def min_for_max(ingrades):
+            ingrades[ingrades.index(min(ingrades))] = max(ingrades)
+            if len(ingrades) > 6:
+                ingrades[ingrades.index(min(ingrades))] = max(ingrades)
+            return ingrades
 
         for peer in self.grades:
-            if peer in self.nopeers: continue
+            if peer in self.nopeers:
+                continue
             grades = [0] + self.grades[peer]
             grades = min_for_max(min_for_max(grades))
             self.grades[peer] = [sum(grades[0:i + 1]) / (i + 1) for i, grade in enumerate(grades) if 0 < i]  # <9]
@@ -116,33 +121,11 @@ class Main:
         for voted in votes:
             peer_name, rank = voted
             peer_name = self.remove_page(peer_name) if peer_name else 0
-            if peer_name in self.nopeers: continue
+            if peer_name in self.nopeers:
+                continue
             for vote in self.owners[peer_name]:
                 assert self.grades[vote][session] >= -100, 'v:%s,p:%s,s:%s' % (vote, peer_name, session)
                 self.grades[vote][session] += rank
-
-    def access_from_module(self):
-        evals = EVALS.split('\n')
-        self.titles = [title for title in evals if title.startswith('P') or title.startswith('N')]
-        # print titles
-        self.avals = dict((t, []) for t in self.titles)
-        # print self.avals
-        # return
-        for ev in evals:
-            if not ev: continue
-            if ev in self.avals:
-                curaval = ev
-            elif ' - ' in ev:
-
-                key, entries = ev.split(' - ')
-                if ' votou' in entries: continue
-                lisentries = [self.remove_ic(entry) for entry in entries.split(' ')]
-                self.avals[curaval].append({key: lisentries})
-        print(self.avals[self.titles[0]])
-        avaldicts = {}
-        self.filter_events()
-        print(self.events)
-        # return
 
     def calculate(self):
         # global self.owners, self.speers, AVALS
@@ -154,7 +137,7 @@ class Main:
             for i, v in self.owners.iteritems():
                 print('    %s = %s,' % (i, str(v)))
         self.events = self.evs + self.events
-        [self.events.pop() for ev in range(self.no_last)]
+        [self.events.pop() for _ in range(self.no_last)]
         avals = self.avals
         # print("avals", avals)
         print("ownwer", self.owners)
@@ -185,7 +168,7 @@ class Main:
         mech.select_form(nr=0)
         mech["user"] = "carlo"
         mech["passwd"] = "labase4ct1v"
-        results = mech.submit().read()
+        mech.submit().read()
         # soup(results)
         mech.open(self.plat + '/evaluation/' + self.page).read()
         self.events = [link.url.split('/')[-1] for link in mech.links()
@@ -205,55 +188,8 @@ class Main:
 
         self.range = [get_range(self.plat+"/evaluation/edit/%s/%s" % (self.page, link)) for link in events]
         print('self.range %s' % self.range)
-        # return
-
-        def _(key):
-            div = key.next.next.next
-            CLEAN = lambda votes: [v.strip().split() or [''] for v in votes]
-            BURST = lambda votes: len(votes[2]) < 2 and votes[0][0] \
-                                  and [0] * (len(self.degrade) - 2) \
-                                      + votes[0] * (3 - len(votes[2])) or votes[2]
-            brs = [str(l).replace(' ', '').replace('\n', ' ') for l in div.contents]
-            brs = ''.join(l.strip() for l in brs).split('<br/>')
-            return {CLEAN(votes.partition('-'))[0][0]:
-                        BURST(CLEAN(votes.partition('-'))) for votes in brs
-                    if CLEAN(votes.partition('-'))[0][0]}
 
         return {l: avs[self.page+"/"+l] for l in self.events}
 
     def main(self):
         self.calculate()
-
-
-if __name__ == "__main__":
-    Main().main()
-'''
-def parse(key):
-    div = key.next.next.next
-    CLEAN = lambda votes: [v.strip().split() or [''] for v in votes]
-    BURST = lambda votes: len(votes[2])  < 2 and votes[0] and [0]* 9 \
-        + votes[0]*(3 - len(votes[2])) or votes[2]
-    brs = [str(l).replace(' ', '').replace('\n', ' ') for l in div.contents]
-    brs  = ''.join(l.strip() for l in brs).split('<br/>')
-    for votes in brs:
-      print CLEAN(votes.partition('-'))
-    x= {0:
-        [BURST(CLEAN(votes.partition('-')))] for votes in brs}
-    return {CLEAN(votes.partition('-'))[0][0]:
-        [BURST(CLEAN(votes.partition('-')))] for votes in brs}
-    return [BURST(votes.partition('-')[2].strip().split()) for votes in brs]
-
-def parse(key):
-    div = key.next.next.next
-    CLEAN = lambda votes: [v.strip().split() or [''] for v in votes]
-    BURST = lambda votes: len(votes[2])  < 2 and votes[0][0] and [0]* 9 \
-        + votes[0]*(3 - len(votes[2])) or votes[2]
-    brs = [str(l).replace(' ', '').replace('\n', ' ') for l in div.contents]
-    brs  = ''.join(l.strip() for l in brs).split('<br/>')
-    return {CLEAN(votes.partition('-'))[0][0]:
-        BURST(CLEAN(votes.partition('-'))) for votes in brs
-        if CLEAN(votes.partition('-'))[0][0]}
-
-avs = {l.text:parse(l) for l in lns if 'evaluation' in str(l)}
-
-'''

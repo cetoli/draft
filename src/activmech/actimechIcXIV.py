@@ -110,33 +110,12 @@ NOPEERS = list(set(peer.split(" - ")[0] for peer in NOPEERS) - set(ALUNOS.keys()
 NPUBLICATION_DIR = '/home/carlo/Dropbox/Public/share/activ/'
 PUBLICATION_DIR = '/home/carlo/Imagens/'
 grades, averages = 'icxv_gradesa.png', 'icxv_averagesa.png'
-OWNERS = dict(
-    Aula_IC12_1_Redes_Sociais='rodgpp walkir'.split(),
-    Aula_IC12_2_Percepcao_e_Contexto='diogo.mvieira leticiamedeiros'.split(),
-    Aula_IC12_3_Sistemas_de_Recomendacao='diogo.mvieira walkir'.split(),
-    Aula_IC12_4_Mobilidade_e_Ubiquidade_para_Colaboracao='RodrigoPadula leticiamedeiros'.split(),
-    Aula_IC12_5_Aprendizagem_Colaborativa_com_Suporte_Computacional='crisanches mauricioribeirogomes'.split(),
-    Aula_IC12_6_Conhecimento_Coletivo='crisanches rodgpp'.split(),
-    Aula_IC12_7_Inteligencia_Artificial_para_Sistemas_Colaborativos='ramos RodrigoPadula'.split(),
-    mauricioribeirogomes=['mauricioribeirogomes'],
-    crisanches=['crisanches'],
-    walkir=['walkir'],
-    ramos=['ramos'],
-    leticiamedeiros=['leticiamedeiros'],
-    rodgpp=['rodgpp'],
-    RodrigoPadula=['RodrigoPadula']
-)
-OWNERS.update({name: [name] for name in 'rj.armandoluiz diogo.mvieira'.split()})
-OWNERS.update({'Inteligencia_Coletiva/' + name: value for name, value in OWNERS.items()})
-# DEGRADE = list(range(9, 0, -1)) + [-1, -2]
 DEGRADE = [90, 85, 78, 71, 64, 57, 50, 43, 36, 29, 22, 15, 8, 1, -10, -20]
-NONOPEERS = 'Carol carlo claudiam abrapacarla edelbem myriamkitz'.split() + \
-            ' sfdanielrg rafamachadoalves vanessaferreira flaviocbarreto'.split() + \
-            ' rj.armandoluiz lucianax flavio cristiane simonecristina'.split()
 AVALS = {}
 OWNERS = {dono: [dono] for dono in ALUNOS.keys()}
 OWNERS.update(CAPITULOS)
-
+# NOPEERS = NOPEERS + CAPITULOS.keys()
+#  OWNERS.update({'Inteligencia_Coletiva/'+name: value for name, value in OWNERS.iteritems()})
 if __name__ == "__main__":
     print(CAPITULOS)
     print(ALUNOS)
