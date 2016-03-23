@@ -213,8 +213,8 @@ def go():
     shuffle(dse)
     shuffle(dve)
     shuffle(dvi)
-    ENFORCE = 6
-    SUPPRESS = -1
+    ENFORCE = 9
+    SUPPRESS = -4
     for i in range(5):
         lse, lve, lvi = dse.pop(),  dve.pop(), dvi.pop()
         setosa.learn([i for j in lse for i in j], ENFORCE)
@@ -260,7 +260,7 @@ def go():
     sscls = sum(1 for cl in ocls for clsd, real in zip(cl, (0, 1, 2)) if clsd[0] == real)
     # print(scls)
     return 100*sscls//(len(scls)*3)
-SAMP = 50
+SAMP = 500
 acc = [go() for _ in range(SAMP)]
 
 print(min(acc), max(acc), sum(acc)//SAMP)  # , acc)
