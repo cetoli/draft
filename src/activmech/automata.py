@@ -27,19 +27,20 @@ SUBF = "NO CARTA AGUA CHAVE ZOOLO SEISPA".split()
 SUBC = dict(NO=(0, 0, 0), CARTA=(UP // 2, 0, 0), AGUA=(0, UP, 0), CHAVE=(0, 0, UP),
             ZOOLO=(UP // 2, UP, 0), SEISPA=(0, UP, UP))
 FUNTEST = "Funções Executivas/ Jogos,Jogo das Cartas,Jogo da Água," \
-        "Jogo da Chave,Jogo do Zoológico,Jogo das 6 Partes".split(",")
-FUNKEYS = "Capacidade,Sequenciamento,Atenção,Resistência," \
+          "Jogo da Chave,Jogo do Zoológico,Jogo das 6 Partes".split(",")
+FUNKEYS = "Capacidade,Sequencia,Atenção,Resistência," \
           "Feedback,Coordenação,Ambientação," \
           "Habilidade".split(",")
 FUNEXEC = "Capacidade de Planejamento,Sequenciamento de Comportamento,Atenção Sustentada,Resistência a Interferência," \
           "Uso de Feedback,Coordenação de Atividade Simultânea,Troca de Ambientação," \
           "Habilidade de lidar com novas situações".split(",")
-PREF = "https://activufrj.nce.ufrj.br/wiki/NeuroXIV_1/"
+PREF = "https://activufrj.nce.ufrj.br/wiki/Neuro_XIV_1/"
 TBL = '<table border="1" cellpadding="0" cellspacing="0">'
 THD = "\t<thead>"
 TBD = "\t<tbody>"
 TRO = "\t\t<tr>"
 TCO = '\t\t\t<td style="width:%dpx;background-color: rgb(%d, %d, %d);">'
+TCH = '\t\t\t<th style="width:%dpx;background-color: rgb(%d, %d, %d);">'
 FTBL = "</table>"
 FTHD = "\t</thead>"
 FTBD = "\t</tbody>"
@@ -47,90 +48,55 @@ FTRO = "\t\t</tr>"
 FTCO = "\t\t\t</td>"
 PDATA = '\t\t\t\t<p align="center">%s</p>'
 TDATA = TCO + "\n" + PDATA + "\n" + FTCO
-LINK = '<a href="https://activufrj.nce.ufrj.br/wiki/NeuroXIV_1/%s#%s">%s</a>'
-TITULO = '<p><a id="%s" name="%s"></a>%s</p><p>&nbsp;</p>'
+THH = TCH + PDATA + "\t\t\t</th>"
+LINK = '<a href="https://activufrj.nce.ufrj.br/wiki/NEURO_XV/%s#%s">%s</a>'
+TITULO = '\t<h2><a id="%s" name="%s"></a>%s</h2>\n\t\t<p>&nbsp; %s</p>'
 HEADC = tuple(x+y for s in SUBF for x, y in zip([GR]*3, SUBC[s]))
 HEADO = [tuple(x+y+UP for x, y in zip([GR]*3, SUBC[s])) for s in SUBF]
-HEAD = """<tr>
-        <td colspan="20" style="width:1188px;">
-        <p align="center">%s</p>
-        </td>
-    </tr>
-    <tr>
-        <td rowspan="4" style="width:342px;height:5px;">
-        <p align="center">Microg&ecirc;neses</p>
-        </td>
-        <td colspan="9" style="width:846px;height:5px;">
-        <p align="center">Sub-filog&ecirc;nese</p>
-        </td>
-    </tr>
-    <tr>
-        <td colspan="3" style="width:290px;background-color: rgb(%d, %d, %d);">
-        <p align="center">Matem&aacute;tica</p>
-        </td>
-        <td colspan="3" style="width:287px;background-color: rgb(%d, %d, %d);">
-        <p align="center">Linguagem</p>
-        </td>
-        <td colspan="3" style="width:269px;background-color: rgb(%d, %d, %d);">
-        <p align="center">Ci&ecirc;ncia</p>
-        </td>
-    </tr>"""
+
+
+def encode(string):
+    return string.replace(' ', '_').replace('Á', 'A').replace('ó', 'o')\
+        .replace('ç', 'c').replace('ã', 'a').replace('ê', 'e')
 
 
 def tabela():
     print(TBL)
-    print(TBD)
+    print(THD)
     print(TRO)
     for fkey, fname in zip(SUBF, FUNTEST):
         cellw = 250 if fkey == "NO" else 150
-        cell = TDATA % ((cellw,) + tuple(GR + color for color in SUBC[fkey]) + (fname,))
+        cell = THH % ((cellw,) + tuple(GR + color for color in SUBC[fkey]) + (fname,))
         print(cell)
         # print(HEAD % head)
     odd = False
     print(FTRO)
-    for funex in FUNEXEC:
+    print(FTHD)
+    print(TBD)
+    for funkey, funex in zip(FUNKEYS, FUNEXEC):
         print(TRO)
         for fkey, fname in zip(SUBF, FUNTEST):
-            cellw = 250 if fkey == "NO" else 150
-            name = funex if fkey == "NO" else funex[:3] + fkey
+            cellw = 280 if fkey == "NO" else 150
+            name = funex if fkey == "NO" else funkey + fkey
+            anchor = LINK % (encode(fname), encode(name), name) if fkey != "NO" else name
             bcolor = GR if odd else GR + 24
-            cell = TDATA % ((cellw,) + tuple(bcolor + color for color in SUBC[fkey]) + (name,))
+            cell = TDATA % ((cellw,) + tuple(bcolor + color for color in SUBC[fkey]) + (anchor,))
             print(cell)
             # print(HEAD % head)
         print(FTRO)
         odd = not odd
-
-        '''
-        for b, st in zip(MICRO, MICROT.split(",")):
-            color = GR if odd else GR + UP
-            odd = not odd
-            color = (color,)*3
-            print(TRO)
-            print (TCO % color+st+FTCO)
-            for c in SUBF:
-                color = tuple(x+y for x, y in zip(color, SUBC[c]))
-                for d, e in zip(ONTO, PONTO):
-                    print(TCO % color)
-                    link = a+c+e
-                    sigla = b+a+c+d
-                    print(LINK % (link, sigla, sigla))
-                    print(FTCO)
-            print(FTRO)
-            '''
     print(FTBD)
     print(FTBL)
 
 
 def codigos():
-    for a in FILO:
-        for c in SUBF:
-            for d, e in zip(ONTO, PONTO):
-                link = a+c+e
-                print('</hr><H1>%s</H1>' % link)
-                for b in MICRO:
-                    sigla = b+a+c+d
-                    print(TITULO % (sigla, sigla, sigla))
+    for fkey, fname in zip(SUBF, FUNTEST)[1:]:
+        print('</hr><H1>%s</H1>' % fname)
+        for funkey, funex in zip(FUNKEYS, FUNEXEC):
+            sigla = funkey+fkey
+            text = "%s para %s" % (funex, fname)
+            print(TITULO % (sigla, encode(sigla), text, text))
 
 
 tabela()
-# codigos()
+codigos()
