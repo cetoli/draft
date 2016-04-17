@@ -23,18 +23,25 @@ Cria a tabela do automata
 __author__ = 'carlo'
 GR = 204
 UP = 24
-SUBF = "NO CARTA AGUA CHAVE ZOOLO SEISPA".split()
+SUBF = "NO CARTA AGUA CHAVE ZOOLO SEISPA TRAIL VERBAL DESIGN COLOR SORT TWENTY WORD TOWER".split()
 SUBC = dict(NO=(0, 0, 0), CARTA=(UP // 2, 0, 0), AGUA=(0, UP, 0), CHAVE=(0, 0, UP),
-            ZOOLO=(UP // 2, UP, 0), SEISPA=(0, UP, UP))
+            ZOOLO=(UP // 2, UP, 0), SEISPA=(0, UP, UP),
+            TRAIL=(UP // 2, 0, UP), VERBAL=(UP // 2, 0, 0), DESIGN=(0, UP, 0), COLOR=(0, 0, UP),
+            SORT=(UP // 2, UP, 0), TWENTY=(0, UP, UP), WORD=(UP // 2, UP // 2, 0), TOWER=(UP // 2, 0, UP)
+
+            )
 FUNTEST = "Funções Executivas/ Jogos,Jogo das Cartas,Jogo da Água," \
-          "Jogo da Chave,Jogo do Zoológico,Jogo das 6 Partes".split(",")
+        "Jogo da Chave,Jogo do Zoológico,Jogo das 6 Partes," \
+          "Trail Making,Verbal Fluency,Design Fluency,Color-Word Interference,Sorting," \
+          "Twenty Questions,Word Context,Tower,Proverb".split(",")
 FUNKEYS = "Capacidade,Sequencia,Atenção,Resistência," \
           "Feedback,Coordenação,Ambientação," \
-          "Habilidade".split(",")
+          "Habilidade,Controle,Formação,Transfere".split(",")
 FUNEXEC = "Capacidade de Planejamento,Sequenciamento de Comportamento,Atenção Sustentada,Resistência a Interferência," \
           "Uso de Feedback,Coordenação de Atividade Simultânea,Troca de Ambientação," \
-          "Habilidade de lidar com novas situações".split(",")
-PREF = "https://activufrj.nce.ufrj.br/wiki/Neuro_XIV_1/"
+          "Habilidade de lidar com novas situações,Controle Inibitorio," \
+          "Formação de Conceito,Transferência de Conceitos para ações".split(",")
+PREF = "https://activufrj.nce.ufrj.br/wiki/NeuroXIV_1/"
 TBL = '<table border="1" cellpadding="0" cellspacing="0">'
 THD = "\t<thead>"
 TBD = "\t<tbody>"
@@ -99,4 +106,4 @@ def codigos():
 
 
 tabela()
-codigos()
+# codigos()
