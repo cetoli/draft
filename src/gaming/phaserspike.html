@@ -1,0 +1,22 @@
+<!DOCTYPE html>
+<html>
+    <head lang="en">
+        <title>Impressious</title>
+        <meta charset="UTF-8">
+        <meta http-equiv="content-type" content="application/xml;charset=utf-8" />
+        <link rel="shortcut icon" href="view/favicon.ico" type="image/x-icon" />
+        <script type="text/javascript" src="../../../js/phaser.min.js"></script>
+        <script type="text/javascript" src="../../../lib/Brython3.2.5/brython.js"></script>
+        <script type="text/python">
+            from pspyke import main
+            from browser import doc, svg, document, html, ajax, alert, window
+            from javascript import JSConstructor
+            PHASER = window.Phaser
+            Game = JSConstructor(PHASER.Game)
+            main(Game, PHASER)
+            </script>
+        </head>
+    <body onLoad="brython(1, {static_stdlib_import: true})" class="main">
+        <div id="pydiv"></div>
+    </body>
+</html>
