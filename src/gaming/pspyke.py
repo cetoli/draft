@@ -10,14 +10,14 @@ class Main:
         self.score = 0
         pass
 
-    def preload(self, *arg):
+    def preload(self, *_):
         self.game.load.image('image-url', 'assets/sky.png')
 
         self.game.load.image('ground', 'assets/platform.png')
         self.game.load.image('star', 'assets/star.png')
         self.game.load.spritesheet('dude', 'assets/dude.png', 32, 48)
 
-    def create(self, *arg):
+    def create(self, *_):
         self.game.physics.startSystem(self.ph.Physics.ARCADE)
         self.game.add.sprite(0, 0, 'image-url')
         self.game.add.sprite(0, 0, 'star')
@@ -96,7 +96,7 @@ class Main:
         if cursors.up.isDown and player.body.touching.down:
             player.body.velocity.y = -350
 
-        def collectStar(player, star):
+        def collectstar(_, star):
             # Removes the star from the screen
             star.kill()
             self.score += 10
@@ -104,7 +104,7 @@ class Main:
 
         self.game.physics.arcade.collide(stars, platforms)
 
-        self.game.physics.arcade.overlap(player, stars, collectStar, None, self)
+        self.game.physics.arcade.overlap(player, stars, collectstar, None, self)
 
 
 def main(Game, auto):
