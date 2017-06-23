@@ -9,7 +9,48 @@ def tupler(x):
     return [(bit,)+tup for bit in (0, 1) for tup in tupler(x-1)] if x else [(0,), (1,)]
 
 
-class Wisard:
+class Cortex:
+    """Discriminador da Rede neural sem peso. :ref:`wisard'
+    """
+    def __init__(self, retinasize=3*4, bleach=0, ramorder=2):
+        # self.cortex = [{t: 0 for t in tupler(ramorder-1)} for _ in range(retinasize//2)]
+        self.cortex = [{(a, b): 0 for a in [0, 1] for b in [0, 1]} for _ in range(retinasize//2)]
+        self.bleach = bleach
+
+    def learn(self, retina, offset=1):
+        def updater(ram, index):
+            return {index: self.cortex[ram][index]+offset}
+        # print(len(retina)//2)
+        x = (len(retina)//2)
+        [self.cortex[ram].update(updater(ram, (retina.pop(RND % len(retina)), retina.pop(RND % len(retina)))))
+         for ram in range(x)]
+
+    def classify(self, retina):
+        x = (len(retina)//2)
+        return ([self.cortex[ram][(retina.pop(RND % len(retina)), retina.pop(RND % len(retina)))]-self.bleach
+                for ram in range(x)])
+
+
+class Lobe:
+    """Rede neural sem peso. :ref:`enplicaw`
+
+    :param data: input data stream.
+    :param topvalue: the largest value of any data.
+    :param factor: retina reduction factor to speed up processing.
+    :param ramorder: number obits adressing the RAM.
+    :param enforce_supress: tuple with one value to offset leraning and a negative to suppress.
+    :param bleach: dictionary of bleaches {classkey: bleach_value}
+    """
+
+    def __init__(self, data, topvalue, factor=1, ramorder=2, enforce_supress=(1, 0), bleach={k: 0 for k in range(6)}):
+        self.retinasize, self.data = len(data), data
+        self.l, self.m, self.n = range(len(self.data))[::-1], range(len(self.data[0][0])), range(len(self.data[0]))
+        l, m, n = self.l, self.m, self.n
+        self.cortex = {key: Cortex(self.retinasize, bleacher) for key, bleacher in bleach.items()}
+        self.enforce, self.supress = enforce_supress
+        self.bleach = bleach
+        self.cortex_keys = sorted(class_key for class_key in bleach.keys())
+        self.sample_entries = [[[self.data[i][j][k] for k in m] for i in l] for j in n]
     """Rede neural sem peso. :ref:`wisard'
     """
     def __init__(self, retinasize=3*4, bleach=0, ramorder=2):
