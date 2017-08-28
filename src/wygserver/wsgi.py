@@ -8,6 +8,8 @@ import bottle
 import os
 import sys
 from bottle import default_app, route, view, get, post, static_file, request, redirect, run, TEMPLATE_PATH
+
+P_N_O_D_E_D = "S_N_O_D_E-%02d"
 here = os.path.dirname(__file__)
 # add your project directory to the sys.path
 project_home = here  # os.path.join(here, "src/")
@@ -27,9 +29,15 @@ LAST = 0
 def register_user():
     global LAST
     LAST += 1
-    gid = ":".join(["N_O_D_E", "%02d" % LAST])
+    gid = "-".join(["P_N_O_D_E", "%02d" % LAST])
     print('game register', gid)
-    return dict(nodekey=gid, lastid=LAST)
+    return dict(nodekey=P_N_O_D_E_D, lastid=LAST)
+
+
+@get('/<filename:re:.*\.py>')
+def code(filename):
+    print('/static/<filename:re:.*\.css>', filename, here)
+    return static_file(filename, root=here)
 
 application = default_app()
 
