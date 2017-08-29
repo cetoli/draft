@@ -1,23 +1,16 @@
 from browser import document, html, window
 from random import randint
 
-P_N_O_D_E_D = "P_N_O_D_E-%02d"
-LISTEN = []
-
 
 class Game:
     def __init__(self, last, nodeid):
         self.last = self.this = last
         self.nid = nodeid
-        # nodeid = nodeid.replace(":", "-")
+        self.peer = None
+        self.conn = []
         window.addEventListener("beforeunload", self.leave_connection)
         print("XXXXXXX>>>> __init__(self, last, nodeid)", last, self.nid % last)
-        self.peer = peer = window.Peer.new(self.nid % last, {'key': '49rhnah5bore8kt9', 'debug': 3})
-
-        peer.on('open', lambda pid: print("peer.on('open', lambda pid", pid))
-        peer.on('connection', self.get_connection)
-        self.conn = [peer.connect(self.nid % nid) for nid in range(1, last) if nid != self.this]
-        # [conn.on('open', lambda: self.open_connection(conn)) for conn in self.conn]
+        self.init_peer(last)
         canvas = document["pydiv"]
         self.base = base = html.DIV(style={"background-color": "gray", "min-height": "400px"})
         base.onclick = self.put_rect
@@ -25,28 +18,35 @@ class Game:
         base <= html.DIV(style={"background-color": "white", "min-height": "40px", "width": "40px", "float": "left"})
         base <= html.DIV(style={"background-color": "red", "min-height": "40px", "width": "40px", "float": "left"})
 
-    def open_connection(self, conn):
-        print("XXXXXXX>>>> open_connection(self, a_node)", conn.peer)
-        conn.on('data', self.receive_rect)
+    def remote_action(self, data=""):
+        self.receive_rect(data)
+
+    def init_peer(self, last):
+        self.peer = peer = window.Peer.new(self.nid % last, {'key': '49rhnah5bore8kt9', 'debug': 0})
+
+        def do_connect(node_id):
+            print("XXXXXXX>>>> init_peer.channel.do_connect", node_id)
+            conn = peer.connect(node_id)
+            conn.on('data', self.receive_rect)
+            return conn
+        peer.on('connection', self.get_connection)
+        self.conn = [do_connect(self.nid % nid) for nid in range(1, last) if nid != self.this]
 
     def get_connection(self, conn):
         print("XXXXXXX>>>> get_connection(self, a_node)", str(conn.peer))
-        # connec = self.peer.connect(self.nid % str(conn.peer))
-        self.cp = conn.peer
-        self.conn.append(conn)
+        if conn.peer not in [cn.peer for cn in self.conn]:
+            print("XXXXXXX>>>> append_connection(self, a_node)", str(conn.peer))
+            self.conn.append(self.peer.connect(str(conn.peer)))
         conn.on('data', self.receive_rect)
+        conn.send("10 20 30")
 
     def receive_rect(self, rgb):
         print("XXXXXXX>>>> receive_rect(self, rgb)", ">%s<" % rgb)
         color = tuple([int(cl) for cl in rgb.split()])
-        # last, color = color.pop(), tuple(color)
-        # self.last = last if last > self.last else self.last
         self.base <= html.DIV(style={"background-color": "rgb(%d, %d, %d)" % color,
                                      "min-height": "40px", "width": "40px", "float": "left"})
-        connec = self.peer.connect(self.nid % str(self.cp))
 
     def put_rect(self, _=0):
-
         rgb = (randint(50, 250), randint(50, 250), randint(50, 250))
         alphargb = " ".join([str(cl) for cl in rgb])
         print("XXXXXXX>>>> def put_rect(self, _=0)", alphargb, rgb, [conn.peer for conn in self.conn])
@@ -54,13 +54,13 @@ class Game:
         self.base <= html.DIV(style={"background-color": "rgb(%d, %d, %d)" % rgb,
                                      "min-height": "40px", "width": "40px", "float": "left"})
 
-    def leave_connection(self):
+    def leave_connection(self, _=0):
         [conn.close() for conn in self.conn]
-        print("XXXXXXX>>>> leave_connection conn.close()", self.peer.destroyed)
-        self.peer.disconnect()
-        print("XXXXXXX>>>> leave_connection.peer.disconnect()", self.peer.destroyed)
-        self.peer.destroy()
-        print("XXXXXXX>>>> leave_connection", self.peer.destroyed)
+        print("XXXXXXX>>>> leave_connection conn.close()", self.conn)
+        # self.peer.disconnect()
+        # print("XXXXXXX>>>> leave_connection.peer.disconnect()", self.peer.destroyed)
+        # self.peer.destroy()
+        # print("XXXXXXX>>>> leave_connection", self.peer.destroyed)
 
 
 def main(last, nodeid):
