@@ -22,25 +22,3 @@
 .. moduleauthor:: Carlo Oliveira <carlo@nce.ufrj.br>
 
 """
-import os
-import sys
-import logging as log
-from bottle import TEMPLATE_PATH
-
-LOG_LEVEL = int(os.getenv("LABASELOG", log.ERROR))
-
-log.basicConfig(level=LOG_LEVEL)
-
-
-P_N_O_D_E_D = "S_N_O_D_E-%02d"
-HERE = os.path.dirname(__file__)
-CLIENT = os.path.join(HERE, "views")
-# add your project directory to the sys.path
-project_home = HERE  # os.path.join(here, "src/")
-if project_home not in sys.path:
-    sys.path = [project_home] + sys.path
-
-# make sure the default templates directory is known to Bottle
-templates_dir = os.path.join(project_home, 'views/')
-if templates_dir not in TEMPLATE_PATH:
-    TEMPLATE_PATH.insert(0, templates_dir)

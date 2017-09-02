@@ -17,30 +17,17 @@
 # Você deve ter recebido uma cópia da Licença Pública Geral GNU
 # junto com este programa, se não, veja em <http://www.gnu.org/licenses/>
 
-"""Handle http requests.
+"""Start wsgi server with bottle.
 
 .. moduleauthor:: Carlo Oliveira <carlo@nce.ufrj.br>
 
 """
-import os
-import sys
-import logging as log
-from bottle import TEMPLATE_PATH
+from server.control.control import main, application
+import server.control.control as sv_ctl
+import server
 
-LOG_LEVEL = int(os.getenv("LABASELOG", log.ERROR))
+_ = application
+sv_ctl.SRC_DIR = server.CLIENT
 
-log.basicConfig(level=LOG_LEVEL)
-
-
-P_N_O_D_E_D = "S_N_O_D_E-%02d"
-HERE = os.path.dirname(__file__)
-CLIENT = os.path.join(HERE, "views")
-# add your project directory to the sys.path
-project_home = HERE  # os.path.join(here, "src/")
-if project_home not in sys.path:
-    sys.path = [project_home] + sys.path
-
-# make sure the default templates directory is known to Bottle
-templates_dir = os.path.join(project_home, 'views/')
-if templates_dir not in TEMPLATE_PATH:
-    TEMPLATE_PATH.insert(0, templates_dir)
+if __name__ == "__main__":
+    main(server.CLIENT)

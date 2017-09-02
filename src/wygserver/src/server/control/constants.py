@@ -34,7 +34,7 @@ log.basicConfig(level=LOG_LEVEL)
 
 P_N_O_D_E_D = "S_N_O_D_E-%02d"
 HERE = os.path.dirname(__file__)
-CLIENT = os.path.join(HERE, "views")
+SRC_DIR = os.path.join(HERE, "views")
 # add your project directory to the sys.path
 project_home = HERE  # os.path.join(here, "src/")
 if project_home not in sys.path:
