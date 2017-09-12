@@ -22,8 +22,7 @@
 .. moduleauthor:: Carlo Oliveira <carlo@nce.ufrj.br>
 
 """
-from browser import document, html, window
-from random import randint
+from browser import window
 
 
 class Connect:
@@ -36,6 +35,9 @@ class Connect:
         window.addEventListener("beforeunload", self.leave_connection)
         print("XXXXXXX>>>> __init__(self, last, nodeid)", last, self.nid % last)
         self.init_peer(last)
+
+    def send(self, data):
+        [conn.send(data) for conn in self.conn]
 
     def _remote_action(self, data=""):
         self.remote_action(data)
