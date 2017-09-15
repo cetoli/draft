@@ -24,7 +24,7 @@
 """
 
 
-class Browser:
+class JSObject:
     """Mocking class Browser.
 
     """
@@ -32,23 +32,14 @@ class Browser:
     document = None
     html = None
     window = None
-    innerHeight = 444
-    innerWidth = 888
-    DIV = None
-    addEventListener = None
-    Peer = None
 
-    def __init__(self):
+    def __init__(self, *_, **__):
         """Mocking class Browser.
 
         """
+        pass
 
-        Browser.document = self
-        Browser.html = self
-        Browser.window = self
-        Browser.Peer = self
-
-    def nodoings(self, *_, **__):
+    def _nodoings(self, *_, **__):
         """ Mocker method to fake brython behaviour.
 
         :param _: Catch all positional parameters
@@ -57,17 +48,3 @@ class Browser:
         """
         return self
 
-    def __getitem__(self, item):
-        """ Mocker method to fake brython behaviour.
-
-        :param item: Catch all positional parameters
-        :return: Mocking class Browser
-        """
-        return self
-
-browser = Browser
-
-document = browser.document = Browser()
-html = browser.html = Browser()
-window = browser.window = Browser()
-DIV = browser.DIV = browser.window.addEventListener = window.addEventListener = window.Peer.new = window.Peer.on = Browser().nodoings
