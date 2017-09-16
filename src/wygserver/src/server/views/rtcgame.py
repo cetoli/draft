@@ -49,7 +49,7 @@ GRAY = (50, 50, 50)
 class Item:
     conn = None
     item = {}
-    prefix = "S_N_O_D_E_%03hd" % randint(0x111, 0xfff) + "-%02d"
+    prefix = "S_N_O_D_E_%03x" % randint(0x111, 0xfff) + "-%02d"
 
     def __init__(self, node_id, rgb, size=SIZE):
         self.container = []
@@ -57,12 +57,13 @@ class Item:
         self.parent, self.node_id, self.rgb, self.size = self._init(node_id, rgb, size)
 
     def _init(self, node_id, rgb, size):
+        print("XXXXXXX>>>> _init", ">%s<" % [node_id, rgb, size])
         height, width = size
         self.side = min(height, width)
         self.base = base = html.DIV(style={"background-color": "rgb(%d, %d, %d)" % rgb,
                                            "min-height": "%dpx" % height, "width": "%dpx" % width, "float": "left"})
         base.onclick = self.add_item
-        parent = Item.item[node_id[:-1]]
+        parent = Item.item[tuple(node_id[:-1])]
         parent <= self
         return parent, node_id, rgb, size
 
@@ -73,7 +74,7 @@ class Item:
         item = Item(node_id=nodeid, rgb=rgb, size=size)
         # self.container.append(item)
         Item.item[nodeid] = item
-        item.send()
+        # item.send()
         return item
 
     def compute_grid(self):
@@ -98,7 +99,8 @@ class Item:
 
     def add_item(self, _=0):
         self.item_count += 1
-        self.create()
+        print("XXXXXXX>>>> _add_item(data)", ">%s<" % [list(self.node_id), list(self.rgb), list(self.size)])
+        self.create().send()
         # Item(self, self.compute_grid())
 
     def send(self):
@@ -108,26 +110,29 @@ class Item:
 
 class Base(Item):
     def __init__(self, last, node_id, rgb=GRAY):
+        self.base = canvas = document["pydiv"]
+
         def _add_item(data):
-            _rgb, _node_id, _size = [tuple(arg) for arg in data]
-            Item.item[node_id].create(_rgb, _node_id, _size)
+            # print("XXXXXXX>>>> _add_item(data)", ">%s<" % data)
+            _node_id, _rgb, _size = tuple(data[0]), tuple(data[1]), tuple(data[2])
+            # print("XXXXXXX>>>> Item.item", ">%s<" % Item.item.keys())
+            # print("XXXXXXX>>>> Item.item[key]", ">%s<" % type(_node_id), _node_id, _node_id[:-1])
+            Item.item[_node_id[:-1]].create(_rgb, _node_id, _size)
 
         class NoItem:
             def __le__(self, square):
-                pass
+                canvas <= square.base
 
         Item.prefix = node_id
         self.no_item = NoItem()
-        size = window.innerHeight - 40, window.innerWidth - 100
+        height,  width = window.innerHeight - 40, window.innerWidth - 100
+        size = height,  width
         Item.item[()], Item.item[(0,)] = self.no_item, self
-        self.base = self.canvas = document["pydiv"]
         Item.__init__(self, (0,), rgb, size)
         Item.conn = Connect(last, node_id, _add_item)
-        self.base = self.canvas = document["pydiv"]
-
-    def __le_(self, square):
-        # self.container.append(square)
-        self.canvas <= square.base
+        self.base.style.left = 40
+        self.base.style.top = 10
+        self.base.style.position = "absolute"
 
 
 class Game:

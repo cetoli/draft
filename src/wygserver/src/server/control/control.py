@@ -28,7 +28,7 @@ from random import randint
 from bottle import default_app, view, get, static_file, run
 import logging as log
 
-P_N_O_D_E_D = "S_N_O_D_E_%03hd" % randint(0x111, 0xfff) + "-%02d"
+P_N_O_D_E_D = "S_N_O_D_E_%03x" % randint(0x111, 0xfff) + "-%02d"
 LAST = 0
 SRC_DIR = ""
 

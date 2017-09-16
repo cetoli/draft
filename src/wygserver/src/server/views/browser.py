@@ -37,6 +37,10 @@ class Browser:
     DIV = None
     addEventListener = None
     Peer = None
+    style = None
+    left = None
+    top = None
+    position = None
 
     def __init__(self):
         """Mocking class Browser.
@@ -47,6 +51,7 @@ class Browser:
         Browser.html = self
         Browser.window = self
         Browser.Peer = self
+        Browser.style = self
 
     def nodoings(self, *_, **__):
         """ Mocker method to fake brython behaviour.
