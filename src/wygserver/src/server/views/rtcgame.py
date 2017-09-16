@@ -71,7 +71,7 @@ class Item:
         rgb = rgb or (randint(50, 250), randint(50, 250), randint(50, 250))
         # Item.conn.send(rgb=rgb, node_id=nodeid)
         item = Item(node_id=nodeid, rgb=rgb, size=size)
-        self.container.append(item)
+        # self.container.append(item)
         Item.item[nodeid] = item
         item.send()
         return item
@@ -111,16 +111,21 @@ class Base(Item):
         def _add_item(data):
             _rgb, _node_id, _size = [tuple(arg) for arg in data]
             Item.item[node_id].create(_rgb, _node_id, _size)
+
+        class NoItem:
+            def __le__(self, square):
+                pass
+
         Item.prefix = node_id
+        self.no_item = NoItem()
         size = window.innerHeight - 40, window.innerWidth - 100
-        Item.item[()] = Item.item[(0,)] = self
+        Item.item[()], Item.item[(0,)] = self.no_item, self
         self.base = self.canvas = document["pydiv"]
         Item.__init__(self, (0,), rgb, size)
         Item.conn = Connect(last, node_id, _add_item)
         self.base = self.canvas = document["pydiv"]
-        # self.create(GRAY, (0, 1), size=[400, 400])
 
-    def __le__(self, square):
+    def __le_(self, square):
         # self.container.append(square)
         self.canvas <= square.base
 
