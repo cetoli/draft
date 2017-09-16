@@ -44,8 +44,9 @@ class Item:
     def _init(self, node_id, rgb, size, parent):
         print("XXXXXXX>>>> _init", ">%s<" % [node_id, rgb, size])
         height, width = size
-        self.base = base = html.DIV(style={"background-color": "rgb(%d, %d, %d)" % rgb,
-                                           "min-height": "%dpx" % height, "width": "%dpx" % width, "float": "left"})
+        self.base = base = html.DIV(style={
+            "background-color": "rgb(%d, %d, %d)" % rgb, "padding": "4px", "margin": "4px",
+            "height": "%dpx" % height, "width": "%dpx" % width, "float": "left"})
         base.onclick = self.add_item
         # parent = Item.item[tuple(node_id[:-1])]
         parent <= self
@@ -69,14 +70,17 @@ class Item:
             else:
                 self.cols = self.cols + 1
             self.capacity = self.rows * self.cols
-        size = height / self.rows-10, width / self.cols-10
+        # size = height / self.rows-10, width / self.cols-10
+        size = (height-1*(self.rows+1))/self.rows, (width-1*(self.cols+1))/self.cols
         # self.resize(size)
         return size
 
     def resize(self, size):
         height, width = self.size = size
-        self.base.style.width = width
-        self.base.style.min_height = height
+        height, width = height-8*(self.rows+1), width-8*(self.cols+1)
+        self.base.style.width = "%dpx" % width
+        self.base.style.height = "%dpx" % height
+        self.size = height, width
         [item.resize((height/self.rows, width/self.cols)) for item in self.container]
 
     def __le__(self, square):

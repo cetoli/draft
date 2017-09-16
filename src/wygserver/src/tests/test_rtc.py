@@ -25,10 +25,11 @@ class TestCaseRtc(unittest.TestCase):
     def test_create_item(self):
         itemer = self.baser
         tester = itemer.create((9, 8, 7))
+        tester.send()
         props = [tester.parent, tester.node_id, tester.rgb, tester.size]
         cprops = [Item.prefix, Item.item]
         csets = ['NOD%02d', {(0, 0): tester, (): itemer.no_item, (0,): itemer}]
-        sets = [itemer, (0, 0), (9, 8, 7), (50, 50)]
+        sets = [itemer, (0, 0), (9, 8, 7), (394, 778)]
         assert Item.conn is not None
         assert itemer.container == [tester], itemer.container
         assert tester.container == [], tester.container
@@ -40,10 +41,11 @@ class TestCaseRtc(unittest.TestCase):
         itemer = self.baser
         first = itemer.create((6, 5, 4))
         tester = itemer.create((9, 8, 7))
+        tester.send()
         props = [tester.parent, tester.node_id, tester.rgb, tester.size]
         cprops = [Item.prefix, Item.item]
         csets = ['NOD%02d', {(0, 1): tester, (0, 0): first, (): itemer.no_item, (0,): itemer}]
-        sets = [itemer, (0, 1), (9, 8, 7), (50, 50)]
+        sets = [itemer, (0, 1), (9, 8, 7), (394, 384)]
         assert Item.conn is not None
         assert itemer.container == [first, tester], itemer.container
         assert tester.container == [], tester.container
@@ -56,10 +58,11 @@ class TestCaseRtc(unittest.TestCase):
         first = itemer.create((6, 5, 4))
         second = itemer.create((9, 8, 7))
         tester = Item.item[(0, 1)].create((3, 2, 1))
+        tester.send()
         props = [tester.parent, tester.node_id, tester.rgb, tester.size]
         cprops = [Item.prefix, Item.item]
         csets = ['NOD%02d', {(0, 1): second, (0, 0): first, (0, 1, 0): tester, (): itemer.no_item, (0,): itemer}]
-        sets = [second, (0, 1, 0), (3, 2, 1), (50, 50)]
+        sets = [second, (0, 1, 0), (3, 2, 1), (384, 374)]
         assert Item.conn is not None
         assert itemer.container == [first, second], itemer.container
         assert tester.container == [], tester.container
@@ -78,18 +81,17 @@ class TestCaseRtc(unittest.TestCase):
         itemer = self.baser
         first = itemer.create((6, 5, 4))
         second = itemer.create((9, 8, 7))
-        tester = _add_item([[3, 2, 1], [0, 1, 0], [50, 50]])
+        tester = _add_item([[3, 2, 1], [0, 1, 0], [384, 374]])
         props = [tester.parent, tester.node_id, tester.rgb, tester.size]
         cprops = [Item.prefix, Item.item]
         csets = ['NOD%02d', {(0, 1): second, (0, 0): first, (0, 1, 0): tester, (): itemer.no_item, (0,): itemer}]
-        sets = [second, (0, 1, 0), (3, 2, 1), (50, 50)]
+        sets = [second, (0, 1, 0), (3, 2, 1), (384, 374)]
         assert Item.conn is not None
         assert itemer.container == [first, second], itemer.container
         assert tester.container == [], tester.container
         assert second.container == [tester], second.container
         assert props == sets, props
         assert cprops == csets, cprops
-        assert self.data == [list(arg) for arg in sets[1:]], self.data
 
 if __name__ == '__main__':
     unittest.main()
