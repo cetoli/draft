@@ -21,10 +21,9 @@ from BeautifulSoup import BeautifulSoup
 
 import os
 
-NTU = 2
+NTU, NUM_JITTERS, TOLERANCE, MODEL = 1, 10, 0.54, "hog"
+# NTU, NUM_JITTERS, TOLERANCE, MODEL = 2, 80, 0.595, "cnn"
 
-NUM_JITTERS = 80
-TOLERANCE = 0.595
 STYLE = """<style> a { border: 8px solid rgba(255,0,0,.4); }
           a:hover{ border:8px solid rgba(0,0,255,.7); }</style>"""
 HTML = """
@@ -37,14 +36,17 @@ HTML = """
 <body>
 <body>
   {style}
+  {picture}
+</body>
+"""
+PIC = """
   <div style="position:relative">
-    {photo}
+    <p><img src="{photo}"/></p>
     {mape}
     <div style="position:relative; float:left">
     {lines}
     </div>
   </div>
-</body>
 """
 IMG = '<p><img src="{}" usemap=#Map /></p>'
 LINE = '\t\t<div style="position:relative; float:left"; min-width:400px>' \
@@ -63,52 +65,44 @@ gabiandrade21
 paulacaldeira
 MateusGontijo
 Wallace
-""".split("\n")
+India
+Bruna033
+Marlonrocha97""".split("\n")
 # NOLO=[]
 LOGIN = """danielleveloso
 Tayza
 SaraHellen
-
 Wallace
 Lara.Pazos
 PizzoCardoso
 beatriztomaz
-
 BeaCris
 ayellenbatista
 carolinna_marques
-
 Laurentinoday
 MarianaFelix
 J.L
-
 NathaliaBessa
 margaridas
 Bruna033
 m_azevedo7
-
 IngridCristine
 rayane
 MateusGontijo
 leticiaant
-
 anac
 crisleitao
 LuanaPalladino
 saridielly
-
 Marlonrocha97
 juliane20
 dayana
 rayanebeltrao
-
 ressanferreira
 marianadias
 India
-
 carolmavila
 paulanovoa
-
 Matheusfernandes
 paulacaldeira
 mariah0rosa
@@ -153,9 +147,10 @@ class Main:
 
     def train_recgnizable_faces(self):
         def is_login(fono_name):
-            is_it = fono_name.split("_")[-2] in LOGIN
-            print('fono_name.split("_")[-1]: {} in fono:{} in :{}'.format(
-                fono_name.split("_")[-2], fono_name, is_it))
+            fono_nome = fono_name.split("@")
+            is_it = (fono_nome[-3] in LOGIN) or fono_nome[-4].startswith("Fono-UNK")
+            print('fono_name.split("_")[-1]: {} in fono @@:{} is ##-->> :{}'.format(
+                fono_nome, fono_name, is_it))
             return is_it
         import os
         fonos = ["fono17_2/" + fon for fon in os.listdir("fono17_2") if is_login(fon)]
@@ -182,7 +177,8 @@ class Main:
         print(photo, exif["DateTimeOriginal"])
         phono_loc_dict = self.reco_faces(photo)
         for phono, loc in phono_loc_dict.items():
-            print("fono {} at {}".format(phono, loc))
+            if "_unk" in phono:
+                print("fono {} at {}".format(phono, loc))
         return photo, exif["DateTimeOriginal"], phono_loc_dict
 
     def reco_faces(self, class_face):
@@ -197,12 +193,26 @@ class Main:
             except:
                 recos = []
 
+            unk = "UNK{n}@unk{n}@00@"
+            z = hash(location_)
+
             face_dict = {
-                self.known_faces[index]: location_ for index, is_there in
-                enumerate(recos) if is_there}
-            print(
-                "location Locs: {}  Top: {}, Left: {}, Bottom: {}, Right: {}"
-                .format(face_dict, top, left, bottom, right))
+                self.known_faces[index] if is_there else unk.format(n=z): location_ for index, is_there in
+                enumerate(recos)}
+            # face_dict = {
+            #     self.known_faces[index]: location_ for index, is_there in
+            #     enumerate(recos) if is_there}
+            # print(
+            #     "location Locs: {}  Top: {}, Left: {}, Bottom: {}, Right: {}"
+            #     .format(face_dict, top, left, bottom, right))
+            if any("@unk" not in name for name in face_dict.keys()):
+                face_dict = {name: location for name, location in face_dict.items() if "@unk" not in name}
+            else:
+                if face_dict.keys():
+                    pil_image = Imger.fromarray(face_image)
+                    pil_image.save("fono17_2/@Fono-{nome}00@.png".format(nome=face_dict.keys()[0]), "PNG")
+
+            print("location Locs: {}  ".format(face_dict))
             return face_dict
 
         # Load the jpg file into a numpy array
@@ -213,13 +223,12 @@ class Main:
         # unless you have an nvidia GPU and dlib compiled with CUDA extensions. But if you do,
         # this will use GPU acceleration and perform well.
         # See also: find_faces_in_picture.py
-        face_locations = face_recognition.face_locations(image, number_of_times_to_upsample=NTU)  # , model="cnn")
-        return {fono: locat for locat in face_locations for fono, locati in match_fono(locat, image).items()
-                if fono}
+        face_locations = face_recognition.face_locations(image, number_of_times_to_upsample=NTU, model=MODEL)  # )
+        fonos = {fono: locat for locat in face_locations for fono, locati in match_fono(locat, image).items() if fono}
+        return fonos
 
     def download_photos(self):
-        url = "https://activufrj.nce.ufrj.br/photo/"
-        page = "/members/Fonoaudiologia?group=2017_2"
+        pages = ["/members/Fonoaudiologia?group=2017_2", "/members/Fonoaudiologia?group=2017_2&page=2"]
         mech = mechanize.Browser()
         mech.set_handle_robots(False)
         mech.open(self.plat)
@@ -228,18 +237,22 @@ class Main:
         mech["user"] = "abrapacarla"
         mech["passwd"] = "vidanova"
         mech.submit().read()
-        print("self.plat + page", self.plat + page)
+        for page in pages:
+            self._scrap_member_page(mech, mech.open(self.plat + page))
+
+    def _scrap_member_page(self, mech, page):
+        url = "https://activufrj.nce.ufrj.br/photo/"
         # mech.open(self.plat + page).read()
-        bf = BeautifulSoup(mech.open(self.plat + page))
+        bf = BeautifulSoup(page)
         # mech.select_form("updateparts")
         members = {login["href"].split("/")[-1]: login["title"]
-                        for login in bf.findAll('a') if ("/user/" in login["href"]) and login.has_key("title")}
+                   for login in bf.findAll('a') if ("/user/" in login["href"]) and login.has_key("title")}
         self.members = [(login, name) for login, name in members.items() if login in self.logins]
         # self.members = [login for login in mech.links]
         # self.members = [(login.name, login.items) for login in mech.controls if login.name in self.logins]
         for member, member_name in self.members:
             photo_url = os.path.join(url, member)
-            filename = os.path.join("fono17_2", "{}_{}_.png".format(member_name, member))
+            filename = os.path.join("fono17_2", "@{}@{}@00@.png".format(member_name, member))
             print("member {}, member_name {}".format(member, filename))
             data = mech.open(photo_url).read()
             save = open(filename, 'wb')
@@ -258,7 +271,7 @@ class Main:
         mech.submit().read()
         # soup(results)
         mech.open(self.plat + '/groups/Fonoaudiologia?group=2017_2/').read()
-        form = mech.select_form("updateparts")
+        mech.select_form("updateparts")
         self.members = [login for login in mech.controls]
         self.members = [login for login in self.members if login.name in self.logins]
         for member in mech.controls:
@@ -283,24 +296,34 @@ class Main:
         # self.logins = [mech.find_control(login) for login in self.logins]
         # print(self.members)
 
-    def html_photo(self, photo_number=1):
-        def parse(nome_):
-            return nome_.split("_")[1].split("/")[-1], nome_.split("_")[-2]
+    def html_photo(self, photo_number=[1]):
         self.train_recgnizable_faces()
-        photo, date, fonod = self.name_photos(PHOTOS[photo_number])
-        mape = MAP.format("\n".join([AREA.format(nome=parse(nome)[0], l=t-200, t=l-30, b=200, r=200)
-                                     for nome, (l, t, b, r) in fonod.items()]))
-        lines = "\n".join(
-            LINE.format(nome=parse(nome)[1], title=parse(nome)[0], src=nome+".png") for nome in fonod.keys())
-        html = HTML.format(style=STYLE, photo=IMG.format(photo), mape=mape, lines=lines)
+        pictures = ""
+        for photo in photo_number:
+            picture = self.create_html_class_picture(photo)
+            pictures += PIC.format(**picture)
+        html = HTML.format(style=STYLE, picture=pictures)
         print(html)
         filename= "/home/carlo/Documentos/dev/draft/src/activmech/fonolista.html"
         save = open(filename, 'wb')
         save.write(html)
         save.close()
 
+    def create_html_class_picture(self, photo_number):
+        def parse(nome_):
+            print("parse(nome_)", nome_)
+            nome_split = nome_.split("@")
+            return nome_split[-4], nome_split[-3]
+        photo, date, fonod = self.name_photos(PHOTOS[photo_number])
+        mape = MAP.format("\n".join([AREA.format(nome=parse(nome)[0], l=t - 200, t=l - 30, b=200, r=200)
+                                     for nome, (l, t, b, r) in fonod.items()]))
+        lines = "\n".join(
+            LINE.format(nome=parse(nome)[1], title=parse(nome)[0], src=nome + ".png")
+            for nome in fonod.keys() if "@unk" not in nome)
+        return dict(lines=lines, mape=mape, photo=photo)
+
     def main(self):
-        self.html_photo(4)
+        self.html_photo([0, 1, 2, 3, 4])
         # self.download_photos()
         # self.scrap_from_page()
 
