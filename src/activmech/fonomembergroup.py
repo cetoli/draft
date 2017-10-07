@@ -21,7 +21,7 @@ from BeautifulSoup import BeautifulSoup
 
 import os
 
-NTU, NUM_JITTERS, TOLERANCE, MODEL = 1, 10, 0.54, "hog"
+NTU, NUM_JITTERS, TOLERANCE, MODEL = 1, 200, 0.5, "hog"
 # NTU, NUM_JITTERS, TOLERANCE, MODEL = 2, 80, 0.595, "cnn"
 
 STYLE = """<style> a { border: 8px solid rgba(255,0,0,.4); }
@@ -51,7 +51,7 @@ PIC = """
 IMG = '<p><img src="{}" usemap=#Map /></p>'
 LINE = '\t\t<div style="position:relative; float:left"; min-width:400px>' \
        '<a id="{nome}" name="{nome}"></a><img alt="{title}" title="{title}" height="350" src="{src}" width="350" />' \
-       '<p><span style="font-size:48px;">{nome}</span></p>' \
+       '<p><span style="font-size:48px;">{title}</span></p>' \
        '</div>'
 # AREA = '<area alt="{nome}" coords="{l},{t},{b},{r}" href="#{nome}" shape="rect" title="{nome}">'
 AREA = """
@@ -149,8 +149,8 @@ class Main:
         def is_login(fono_name):
             fono_nome = fono_name.split("@")
             is_it = (fono_nome[-3] in LOGIN) or fono_nome[-4].startswith("Fono-UNK")
-            print('fono_name.split("_")[-1]: {} in fono @@:{} is ##-->> :{}'.format(
-                fono_nome, fono_name, is_it))
+            print('fono_name.split("_")[-1]: {} in fono @@:{} is ##-->> :{}\t\t\t##:{}'.format(
+                fono_nome[-3], fono_name[-4], is_it, fono_name))
             return is_it
         import os
         fonos = ["fono17_2/" + fon for fon in os.listdir("fono17_2") if is_login(fon)]
@@ -205,12 +205,13 @@ class Main:
             # print(
             #     "location Locs: {}  Top: {}, Left: {}, Bottom: {}, Right: {}"
             #     .format(face_dict, top, left, bottom, right))
-            if any("@unk" not in name for name in face_dict.keys()):
-                face_dict = {name: location for name, location in face_dict.items() if "@unk" not in name}
+            if any(("@unk" not in name) or ("@Fono-" in name) for name in face_dict.keys()):
+                face_dict = {name: location for name, location in face_dict.items()
+                             if ("@unk" not in name) or ("@Fono-" in name)}
             else:
                 if face_dict.keys():
                     pil_image = Imger.fromarray(face_image)
-                    pil_image.save("fono17_2/@Fono-{nome}00@.png".format(nome=face_dict.keys()[0]), "PNG")
+                    pil_image.save("fono17_2/@Fono-{nome}.png".format(nome=face_dict.keys()[0]), "PNG")
 
             print("location Locs: {}  ".format(face_dict))
             return face_dict
@@ -319,7 +320,7 @@ class Main:
                                      for nome, (l, t, b, r) in fonod.items()]))
         lines = "\n".join(
             LINE.format(nome=parse(nome)[1], title=parse(nome)[0], src=nome + ".png")
-            for nome in fonod.keys() if "@unk" not in nome)
+            for nome in fonod.keys() if ("@unk" not in nome) or ("@Fono-" in nome))
         return dict(lines=lines, mape=mape, photo=photo)
 
     def main(self):
