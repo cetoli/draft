@@ -290,7 +290,7 @@ class Main:
                     pass
 
         reponse = mech.submit()
-        print reponse.read()
+        print(reponse.read())
 
         # self.members = [login for login in mech.find_control(type="checkbox").items]
         # self.logins = [mech.find_control(login) for login in self.logins]
