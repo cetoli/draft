@@ -1,0 +1,18 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8">
+    <title>Quintus</title>
+    <script src='http://cdn.html5quintus.com/v0.2.0/quintus-all.js'></script>
+    <script type="text/javascript" src="https://cdn.rawgit.com/brython-dev/brython/3.2.6/www/src/brython.js"></script>
+    <script type="text/python">
+        from quintus import main
+        from browser import window
+        main(window)
+    </script>
+  </head>
+    <body onLoad="brython(1, {static_stdlib_import: true})" class="main">
+        <div id="pydiv"></div>
+    </body>
+</html>
+

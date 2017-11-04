@@ -21,7 +21,7 @@ from BeautifulSoup import BeautifulSoup
 
 import os
 
-NTU, NUM_JITTERS, TOLERANCE, MODEL = 1, 200, 0.5, "hog"
+NTU, NUM_JITTERS, TOLERANCE, MODEL = 0, 0, 0.5, "cnn"
 # NTU, NUM_JITTERS, TOLERANCE, MODEL = 2, 80, 0.595, "cnn"
 
 STYLE = """<style> a { border: 8px solid rgba(255,0,0,.4); }
