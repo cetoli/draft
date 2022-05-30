@@ -20,8 +20,12 @@ Changelog
 import mechanize
 import ssl
 import json
-from bs4 import BeautifulSoup
-from collections import Counter
+import os
+LABA = ""
+try:
+    LABA = os.environ['LABA']
+except KeyError as err:
+    print(f"Given key not found - {err}")
 
 try:
     _create_unverified_https_context = ssl._create_unverified_context
@@ -50,7 +54,7 @@ class Main:
 
         mech.select_form(nr=0)
         mech["user"] = "carlo"
-        mech["passwd"] = "labase4ct1v"
+        mech["passwd"] = LABA
         mech.submit().read()
 
     def scrap_from_page(self, author, page):
@@ -72,19 +76,12 @@ class Main:
 
         avs = self.mech.open(self.plat + '/rest' + page).read()
         avs = json.loads(avs)["result"]["wikidata"]
-        # doc = soup(avs)
-        # lns = doc.findAll('a')
-        # soup = BeautifulSoup(avs["conteudo"])
-        # avs["texto"] = Counter(soup.get_text().lower().split())
-
-        # [print(key, value[:100] if isinstance(value, str) else value) for key, value in avs.items()]
         return avs
 
     def main(self):
+        """Login and scrap page versions"""
         self.pages = [(taut := author.split("http"), taut[0], taut[1].split("wiki")[1])[1:]
                       for author in PAGES.split("\n")]
-        # self.pages = {author: link for author, link in self.pages}
-        # [print(pg) for pg in self.pages]
         self.login()
         author_data = [self.scrap_from_page(author, page) for author, page in self.pages]
         with open("author_data.json", "w") as outfile:
