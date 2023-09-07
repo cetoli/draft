@@ -21,6 +21,7 @@ import mechanize
 import ssl
 import json
 import os
+
 LABA = ""
 try:
     LABA = os.environ['LABA']
@@ -35,6 +36,8 @@ except AttributeError:
 else:
     # Handle target environment that doesn't support HTTPS verification
     ssl._create_default_https_context = _create_unverified_https_context
+
+
 # ssl_version corrections are done
 
 
@@ -64,11 +67,11 @@ class Main:
         print(self.plat + '/wiki/history' + page)
         mech.open(self.plat + '/wiki/history' + page).read()
         # self.events = [link.url.split('/')[-1] for link in mech.links()
-        versions = [link.url for link in mech.links() if "wiki"+page in link.url]
+        versions = [link.url for link in mech.links() if "wiki" + page in link.url]
         # [print(eve) for eve in versions]
         # versions = self.read_version(versions[1])
         all_vers = len(versions)
-        return [dict(author=author,version=all_vers-ver, **self.read_version(version))
+        return [dict(author=author, version=all_vers - ver, **self.read_version(version))
                 for ver, version in enumerate(versions)]
 
     def read_version(self, page):
@@ -84,12 +87,12 @@ class Main:
                       for author in PAGES.split("\n")]
         self.login()
         author_data = [self.scrap_from_page(author, page) for author, page in self.pages]
-        with open("author_data.json", "w") as outfile:
+        with open("author_data23_9.json", "w") as outfile:
             json.dump(author_data, outfile, indent=4)
 
 
 # PAGES = """Tiago https://activufrj.nce.ufrj.br/wiki/MATERIAIS.DESIGN.ARQUITETURA/Tiago_Historia_do_Jogo_Mag_Toby
-PAGES = """Adrian https://activufrj.nce.ufrj.br/wiki/MATERIAIS.DESIGN.ARQUITETURA/Pizza_Sapo_Adrian_e_Tiago
+_PAGES = """Adrian https://activufrj.nce.ufrj.br/wiki/MATERIAIS.DESIGN.ARQUITETURA/Pizza_Sapo_Adrian_e_Tiago
 Adriana https://activufrj.nce.ufrj.br/wiki/MATERIAIS.DESIGN.ARQUITETURA/Adriana
 Alexandro https://activufrj.nce.ufrj.br/wiki/MATERIAIS.DESIGN.ARQUITETURA/Alexandro
 Eduardo https://activufrj.nce.ufrj.br/wiki/MATERIAIS.DESIGN.ARQUITETURA/Eduardo
@@ -102,7 +105,16 @@ Miguel Belmonte https://activufrj.nce.ufrj.br/wiki/MATERIAIS.DESIGN.ARQUITETURA/
 Diego Belmonte https://activufrj.nce.ufrj.br/wiki/MATERIAIS.DESIGN.ARQUITETURA/Diego_Belmonte
 Isaque https://activufrj.nce.ufrj.br/wiki/MATERIAIS.DESIGN.ARQUITETURA/Isaque
 Arthur https://activufrj.nce.ufrj.br/wiki/MATERIAIS.DESIGN.ARQUITETURA/ARTHUR"""
-
+PAGE = """Tiago https://activufrj.nce.ufrj.br/wiki/MATERIAIS.DESIGN.ARQUITETURA/Tiago__Historia_do_Jogo_Mag__Toby"""
+PAGES = """Adrian https://activufrj.nce.ufrj.br/wiki/MATERIAIS.DESIGN.ARQUITETURA/Pizza_Sapo_Adrian_e_Tiago
+Adriana https://activufrj.nce.ufrj.br/wiki/MATERIAIS.DESIGN.ARQUITETURA/Adriana
+Alexsandro https://activufrj.nce.ufrj.br/wiki/MATERIAIS.DESIGN.ARQUITETURA/Alexandro
+Eduardo https://activufrj.nce.ufrj.br/wiki/MATERIAIS.DESIGN.ARQUITETURA/Eduardo
+Isabela https://activufrj.nce.ufrj.br/wiki/MATERIAIS.DESIGN.ARQUITETURA/Isabela
+Leon https://activufrj.nce.ufrj.br/wiki/MATERIAIS.DESIGN.ARQUITETURA/Leon
+Letícia https://activufrj.nce.ufrj.br/wiki/MATERIAIS.DESIGN.ARQUITETURA/Leticia
+Miguel Tavares https://activufrj.nce.ufrj.br/wiki/MATERIAIS.DESIGN.ARQUITETURA/Miguel_Tavares
+Alvaro https://activufrj.nce.ufrj.br/wiki/MATERIAIS.DESIGN.ARQUITETURA/Alvaro"""
 
 if __name__ == "__main__":
     Main().main()
