@@ -107,6 +107,7 @@ Isaque https://activufrj.nce.ufrj.br/wiki/MATERIAIS.DESIGN.ARQUITETURA/Isaque
 Arthur https://activufrj.nce.ufrj.br/wiki/MATERIAIS.DESIGN.ARQUITETURA/ARTHUR"""
 PAGE = """Tiago https://activufrj.nce.ufrj.br/wiki/MATERIAIS.DESIGN.ARQUITETURA/Tiago__Historia_do_Jogo_Mag__Toby"""
 PAGES = """Adrian https://activufrj.nce.ufrj.br/wiki/MATERIAIS.DESIGN.ARQUITETURA/Pizza_Sapo_Adrian_e_Tiago
+Tiago https://activufrj.nce.ufrj.br/wiki/MATERIAIS.DESIGN.ARQUITETURA/Tiago__Historia_do_Jogo_Mag__Toby
 Adriana https://activufrj.nce.ufrj.br/wiki/MATERIAIS.DESIGN.ARQUITETURA/Adriana
 Alexsandro https://activufrj.nce.ufrj.br/wiki/MATERIAIS.DESIGN.ARQUITETURA/Alexandro
 Eduardo https://activufrj.nce.ufrj.br/wiki/MATERIAIS.DESIGN.ARQUITETURA/Eduardo
@@ -114,7 +115,10 @@ Isabela https://activufrj.nce.ufrj.br/wiki/MATERIAIS.DESIGN.ARQUITETURA/Isabela
 Leon https://activufrj.nce.ufrj.br/wiki/MATERIAIS.DESIGN.ARQUITETURA/Leon
 Letícia https://activufrj.nce.ufrj.br/wiki/MATERIAIS.DESIGN.ARQUITETURA/Leticia
 Miguel Tavares https://activufrj.nce.ufrj.br/wiki/MATERIAIS.DESIGN.ARQUITETURA/Miguel_Tavares
-Alvaro https://activufrj.nce.ufrj.br/wiki/MATERIAIS.DESIGN.ARQUITETURA/Alvaro"""
-
+Alvaro https://activufrj.nce.ufrj.br/wiki/MATERIAIS.DESIGN.ARQUITETURA/Alvaro
+Miguel Belmonte https://activufrj.nce.ufrj.br/wiki/MATERIAIS.DESIGN.ARQUITETURA/Miguel_Belmonte
+Diego Belmonte https://activufrj.nce.ufrj.br/wiki/MATERIAIS.DESIGN.ARQUITETURA/Diego_Belmonte
+Isaque https://activufrj.nce.ufrj.br/wiki/MATERIAIS.DESIGN.ARQUITETURA/Isaque
+Arthur https://activufrj.nce.ufrj.br/wiki/MATERIAIS.DESIGN.ARQUITETURA/ARTHUR"""
 if __name__ == "__main__":
     Main().main()
